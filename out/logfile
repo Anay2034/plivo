@@ -1,0 +1,101 @@
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/train.py \
+  --model_name distilbert-base-uncased \
+  --train data/train.jsonl \
+  --dev data/dev.jsonl \
+  --out_dir out
+
+Some weights of DistilBertForTokenClassification were not initialized from the model checkpoint at distilbert-base-uncased and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Epoch 1/8:   0%|                                                                                            | 0/54 [00:00<?, ?it/s]huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+Epoch 1/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:22<00:00,  2.43it/s]
+Epoch 1 average loss: 2.2648
+Epoch 2/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:21<00:00,  2.48it/s]
+Epoch 2 average loss: 0.5451
+Epoch 3/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:21<00:00,  2.51it/s]
+Epoch 3 average loss: 0.0372
+Epoch 4/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:21<00:00,  2.52it/s]
+Epoch 4 average loss: 0.0120
+Epoch 5/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:21<00:00,  2.48it/s]
+Epoch 5 average loss: 0.0081
+Epoch 6/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:21<00:00,  2.48it/s]
+Epoch 6 average loss: 0.0065
+Epoch 7/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:21<00:00,  2.48it/s]
+Epoch 7 average loss: 0.0058
+Epoch 8/8: 100%|███████████████████████████████████████████████████████████████████████████████████| 54/54 [00:21<00:00,  2.49it/s]
+Epoch 8 average loss: 0.0055
+Saved model + tokenizer to out
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/predict.py \
+  --model_dir out \
+  --input data/dev.jsonl \
+  --output out/dev_pred.json \
+  --confidence_threshold 0.1
+Wrote predictions for 10 utterances to out/dev_pred.json
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/eval_span_f1.py \
+  --gold data/dev.jsonl \
+  --pred out/dev_pred.json
+Per-entity metrics:
+CITY            P=1.000 R=1.000 F1=1.000
+DATE            P=1.000 R=1.000 F1=1.000
+EMAIL           P=1.000 R=1.000 F1=1.000
+LOCATION        P=1.000 R=1.000 F1=1.000
+PERSON_NAME     P=1.000 R=1.000 F1=1.000
+PHONE           P=1.000 R=1.000 F1=1.000
+
+Macro-F1: 1.000
+
+PII-only metrics: P=1.000 R=1.000 F1=1.000
+Non-PII metrics: P=1.000 R=1.000 F1=1.000
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/predict.py \
+  --model_dir out \
+  --input data/stress.jsonl \
+  --output out/stress_pred.json \
+  --confidence_threshold 0.1
+Wrote predictions for 100 utterances to out/stress_pred.json
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/eval_span_f1.py \
+  --gold data/stress.jsonl \
+  --pred out/stress_pred.json
+Per-entity metrics:
+CITY            P=1.000 R=1.000 F1=1.000
+CREDIT_CARD     P=0.000 R=0.000 F1=0.000
+DATE            P=1.000 R=1.000 F1=1.000
+EMAIL           P=0.125 R=0.125 F1=0.125
+PERSON_NAME     P=0.272 R=1.000 F1=0.428
+PHONE           P=0.336 R=1.000 F1=0.503
+
+Macro-F1: 0.509
+
+PII-only metrics: P=0.427 R=0.765 F1=0.548
+Non-PII metrics: P=1.000 R=1.000 F1=1.000
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/measure_latency.py \
+  --model_dir out \
+  --input data/dev.jsonl \
+  --runs 50
+Latency over 50 runs (batch_size=1):
+  p50: 12.86 ms
+  p95: 13.27 ms
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/predict.py \
+  --model_dir out \
+  --input data/test.jsonl \
+  --output out/test_pred.json \
+  --confidence_threshold 0.1
+
+Wrote predictions for 175 utterances to out/test_pred.json
+(venv) (base) anay@Anays-MacBook-Air pii_ner_assignment_IITB % python src/eval_span_f1.py \   
+  --gold data/test.jsonl \  
+  --pred out/test_pred.json
+Per-entity metrics:
+CITY            P=1.000 R=1.000 F1=1.000
+CREDIT_CARD     P=1.000 R=1.000 F1=1.000
+DATE            P=1.000 R=1.000 F1=1.000
+EMAIL           P=1.000 R=1.000 F1=1.000
+LOCATION        P=1.000 R=1.000 F1=1.000
+PERSON_NAME     P=1.000 R=1.000 F1=1.000
+PHONE           P=1.000 R=1.000 F1=1.000
+
+Macro-F1: 1.000
+
+PII-only metrics: P=1.000 R=1.000 F1=1.000
+Non-PII metrics: P=1.000 R=1.000 F1=1.000
